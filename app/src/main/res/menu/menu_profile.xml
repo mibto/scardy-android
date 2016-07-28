@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="me.scardy.ProfileFragment">
+
+    <item
+            android:id="@+id/save_profile"
+            app:showAsAction="always"
+            android:icon="@mipmap/ic_done_wht_24dp"
+            android:title="@string/action_settings"/>
+</menu>
