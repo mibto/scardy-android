@@ -5,12 +5,14 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static me.scardy.Constants.ENCRYPTION_MODE;
@@ -108,7 +110,7 @@ public class CryptoClient {
 
             if ( masterKey != null ) {
                 String decryptedKey = decrypt( masterKey, new String( ivAndEncryptedKey ) );
-                return new SecretKeySpec( decryptedKey.getBytes(), 0, decryptedKey.length(), "AES" );
+                return getKeyFromString( decryptedKey );
             }
         } catch ( Exception e ) {
             e.printStackTrace();
@@ -117,4 +119,23 @@ public class CryptoClient {
     }
 
 
+    public SecretKey generateAESKey() {
+        try {
+            KeyGenerator keyGen;
+            keyGen = KeyGenerator.getInstance( "AES" );
+            keyGen.init( 256 ); //256 bit AES Key
+            return keyGen.generateKey();
+        } catch ( NoSuchAlgorithmException e ) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public SecretKey getKeyFromString( String keyAsString ) {
+        return new SecretKeySpec( Base64.decode( keyAsString, Base64.NO_WRAP ), 0, 32, "AES" );
+    }
+
+    public String getStringFromKey( SecretKey key ) {
+        return Base64.encodeToString( key.getEncoded(), Base64.NO_WRAP );
+    }
 }

@@ -23,22 +23,51 @@
                 android:src="@drawable/user"/>
 
         <TextView
-                android:id="@+id/list_title"
+                android:id="@+id/list_full_name"
                 android:layout_marginTop="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_alignStart="@+id/list_desc"
+                android:layout_alignStart="@+id/list_address"
                 android:textAppearance="?attr/textAppearanceListItem"
                 android:textColor="#000000"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:layout_toEndOf="@+id/list_avatar"/>
 
         <TextView
-                android:id="@+id/list_desc"
+                android:id="@+id/list_address"
                 android:layout_marginBottom="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/list_title"
+                android:layout_toEndOf="@+id/list_avatar"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:layout_below="@+id/list_full_name"
+                android:layout_alignStart="@+id/list_phone"/>
+
+        <TextView
+                android:id="@+id/list_phone"
+                android:layout_marginBottom="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/list_avatar"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:layout_below="@+id/list_address"
+                android:layout_alignStart="@+id/list_email"/>
+
+        <TextView
+                android:id="@+id/list_email"
+                android:layout_marginBottom="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_phone"
                 android:layout_marginStart="16dp"
                 android:layout_toEndOf="@+id/list_avatar"
                 android:ellipsize="end"

@@ -6,8 +6,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.crypto.SecretKey;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static me.scardy.Constants.KEY;
 import static me.scardy.Constants.LABEL;
@@ -15,14 +15,15 @@ import static me.scardy.Constants.PERMISSIONS;
 
 public class SharedKey {
     private String label;
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
     private SecretKey key;
+    private boolean hasChanged = false;
 
     public SharedKey() {
-        this.permissions = new ArrayList<>();
+        this.permissions = new HashSet<>();
     }
 
-    public SharedKey( SecretKey key, String label, List<Permission> permissions ) {
+    public SharedKey( SecretKey key, String label, Set<Permission> permissions ) {
         this.key = key;
         this.label = label;
         this.permissions = permissions;
@@ -36,15 +37,24 @@ public class SharedKey {
         this.label = label;
     }
 
-    public List<Permission> getPermissions() {
+    public Set<Permission> getPermissions() {
         return permissions;
+    }
+
+    public boolean hasPermission( Permission permission ) {
+        for ( Permission permission1 : permissions ) {
+            if ( permission1.getPermission().equals( permission.getPermission() ) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addPermission( Permission permission ) {
         this.permissions.add( permission );
     }
 
-    public void setPermissions( List<Permission> permissions ) {
+    public void setPermissions( Set<Permission> permissions ) {
         this.permissions = permissions;
     }
 
@@ -56,15 +66,24 @@ public class SharedKey {
         this.key = key;
     }
 
+    public void setHasChanged() {
+        hasChanged = true;
+    }
+
+    public boolean hasChanged() {
+        return hasChanged;
+    }
+
     public JSONObject toJSON() throws JSONException {
         JSONObject sharedKeyAsJSON = new JSONObject();
         sharedKeyAsJSON.put( LABEL, label );
         JSONArray permissionsAsJSON = new JSONArray();
         for ( Permission permission : permissions ) {
-            permissionsAsJSON.put( permission );
+            JSONObject permissionAsJSON = new JSONObject();
+            permissionsAsJSON.put( permissionAsJSON.put( permission.name(), permission.getValue() ) );
         }
         sharedKeyAsJSON.put( PERMISSIONS, permissionsAsJSON );
-        sharedKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), 0 ) );
+        sharedKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), Base64.NO_WRAP ) );
         return sharedKeyAsJSON;
     }
 }

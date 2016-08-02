@@ -4,8 +4,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.crypto.SecretKey;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class KeyStore {
     private Profile profile = new Profile();
@@ -20,10 +25,28 @@ public class KeyStore {
     public KeyStore( JSONObject keyStoreAsJSON ) throws JSONException {
         JSONArray profileAsJSON = keyStoreAsJSON.getJSONArray( Constants.PROFILE );
         JSONArray sharedKeysAsJSON = keyStoreAsJSON.getJSONArray( Constants.SHARED_KEYS );
-        JSONArray contactKeys = keyStoreAsJSON.getJSONArray( Constants.CONTACT_KEYS );
+        JSONArray contactKeysAsJSON = keyStoreAsJSON.getJSONArray( Constants.CONTACT_KEYS );
 
         this.profile = new Profile( profileAsJSON );
 
+        for ( int i = 0; i < sharedKeysAsJSON.length(); i++ ) {
+            JSONObject sharedKeyAsJSON = sharedKeysAsJSON.getJSONObject( i );
+            SecretKey sharedKey = new CryptoClient().getKeyFromString( sharedKeyAsJSON.getString( Constants.KEY ) );
+            Set<Permission> permissions = new HashSet<>();
+            JSONArray permissionsAsJSON = sharedKeyAsJSON.getJSONArray( Constants.PERMISSIONS );
+            for ( int k = 0; k < permissionsAsJSON.length(); k++ ) {
+                Permission permission = Permission.valueOf( permissionsAsJSON.getJSONObject( k ).keys().next() );
+                permission.setValue( permissionsAsJSON.getJSONObject( k ).getString( permission.name() ) );
+                permissions.add( permission );
+            }
+            sharedKeys.add( new SharedKey( sharedKey, sharedKeyAsJSON.optString( Constants.LABEL ), permissions ) );
+        }
+
+        for ( int i = 0; i < contactKeysAsJSON.length(); i++ ) {
+            JSONObject contactKeyAsJSON = contactKeysAsJSON.getJSONObject( i );
+            SecretKey contactKey = new CryptoClient().getKeyFromString( contactKeyAsJSON.getString( Constants.KEY ) );
+            contactKeys.add( new ContactKey( contactKey ) );
+        }
 
     }
 
@@ -37,6 +60,27 @@ public class KeyStore {
 
     public List<SharedKey> getSharedKeys() {
         return sharedKeys;
+    }
+
+    public SharedKey getSharedKey( SecretKey key ) {
+        for ( SharedKey sharedKey : sharedKeys ) {
+            if ( Arrays.equals( sharedKey.getKey().getEncoded(), key.getEncoded() ) ) {
+                return sharedKey;
+            }
+        }
+        return null;
+    }
+
+    public void replaceSharedKey( SharedKey sharedKeyNew ) {
+        Iterator<SharedKey> iterator = sharedKeys.iterator();
+
+        while ( iterator.hasNext() ) {
+            SharedKey sharedKeyOld = iterator.next();
+            if ( sharedKeyNew.getKey().equals( sharedKeyOld.getKey() ) ) {
+                iterator.remove();
+            }
+        }
+        sharedKeys.add( sharedKeyNew );
     }
 
     public void setSharedKeys( List<SharedKey> sharedKeys ) {
@@ -73,5 +117,15 @@ public class KeyStore {
         }
         keyStoreAsJSON.put( Constants.CONTACT_KEYS, contactKeysAsJSON );
         return keyStoreAsJSON;
+    }
+
+    public List<SharedKey> getChangedSharedKeys() {
+        List<SharedKey> changedSharedKeys = new ArrayList<>();
+        for ( SharedKey sharedKey : sharedKeys ) {
+            if ( sharedKey.hasChanged() ) {
+                changedSharedKeys.add( sharedKey );
+            }
+        }
+        return changedSharedKeys;
     }
 }

@@ -2,14 +2,7 @@
     <string name="app_name">Scardy</string>
     <string name="title_activity_scardy">Scardy</string>
     <string name="action_settings">Settings</string>
-    <string-array name="phone_places">
-        <item>Home</item>
-        <item>Work</item>
-        <item>Mobile</item>
-        <item>Fax</item>
-    </string-array>
-    <string-array name="address_places">
-        <item>Home</item>
-        <item>Work</item>
-    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="action_done">Done</string>
 </resources>

@@ -6,22 +6,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import me.scardy.SharesFragment.OnListFragmentInteractionListener;
-import me.scardy.dummy.DummyContent.DummyItem;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link ContactKey} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class ShareRecyclerViewAdapter extends RecyclerView.Adapter<ShareRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<SharedKey> shares;
     private final OnListFragmentInteractionListener mListener;
 
-    public ShareRecyclerViewAdapter( List<DummyItem> items, OnListFragmentInteractionListener listener ) {
-        mValues = items;
+    public ShareRecyclerViewAdapter( List<SharedKey> items, OnListFragmentInteractionListener listener ) {
+        shares = items;
         mListener = listener;
     }
 
@@ -31,11 +30,15 @@ public class ShareRecyclerViewAdapter extends RecyclerView.Adapter<ShareRecycler
         return new ViewHolder( view );
     }
 
+    public void addShare( SharedKey sharedKey ) {
+        shares.add( sharedKey );
+    }
+
     @Override
     public void onBindViewHolder( final ViewHolder holder, int position ) {
-        holder.mItem = mValues.get( position );
-        holder.mIdView.setText( mValues.get( position ).id );
-        holder.mContentView.setText( mValues.get( position ).content );
+        holder.mItem = shares.get( position );
+        holder.mIdView.setText( new CryptoClient().getHash( shares.get( position ).getKey().getEncoded() ) );
+        holder.mContentView.setText( shares.get( position ).getLabel() );
 
         holder.mView.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -52,20 +55,26 @@ public class ShareRecyclerViewAdapter extends RecyclerView.Adapter<ShareRecycler
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return shares.size();
+    }
+
+    public void addShares( List<SharedKey> sharedKeys ) {
+        for ( SharedKey sharedKey : sharedKeys ) {
+            shares.add( sharedKey );
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
-        public DummyItem mItem;
+        public SharedKey mItem;
 
         public ViewHolder( View view ) {
             super( view );
             mView = view;
-            mIdView = (TextView) view.findViewById( R.id.list_title );
-            mContentView = (TextView) view.findViewById( R.id.list_desc );
+            mIdView = (TextView) view.findViewById( R.id.list_full_name );
+            mContentView = (TextView) view.findViewById( R.id.list_address );
         }
 
         @Override

@@ -20,12 +20,13 @@ public class ContactKey {
 
     public ContactKey( SecretKey key ) {
         this.key = key;
+        lastUpdateDate = new Date();
     }
 
     public JSONObject toJSON() throws JSONException {
         JSONObject contactKeyAsJSON = new JSONObject();
         contactKeyAsJSON.put( LAST_UPDATE_DATE, lastUpdateDate.getTime() );
-        contactKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), 0 ) );
+        contactKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), Base64.NO_WRAP ) );
         return contactKeyAsJSON;
     }
 

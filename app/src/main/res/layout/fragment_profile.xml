@@ -60,7 +60,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:inputType="textPersonName"
-                                android:text="Name"
+                                android:hint="Name"
                                 android:ems="10"
                                 android:id="@+id/full_name_input"/>
                     </LinearLayout>
@@ -85,7 +85,7 @@
                                 android:inputType="phone"
                                 android:ems="10"
                                 android:id="@+id/phone_input"
-                                android:text="Phone"
+                                android:hint="Phone"
                                 android:layout_weight="1"/>
 
                     </LinearLayout>
@@ -109,7 +109,7 @@
                                 android:inputType="textEmailAddress"
                                 android:ems="10"
                                 android:id="@+id/email_input"
-                                android:text="Email"
+                                android:hint="Email"
                                 android:layout_weight="1"/>
 
                     </LinearLayout>
@@ -133,7 +133,7 @@
                                 android:inputType="textPostalAddress"
                                 android:ems="10"
                                 android:id="@+id/address_input"
-                                android:text="Address"
+                                android:hint="Address"
                                 android:layout_weight="1"/>
 
                     </LinearLayout>

@@ -71,9 +71,9 @@ public class ApiClient {
         return null;
     }
 
-    public String getSharedDataStore( String id, Date version ) {
+    public String getSharedDataStore( SecretKey sharedKey, Date version ) {
         try {
-            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + id + "?version=" + version.getTime() );
+            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + cryptoClient.getHash( sharedKey.getEncoded() ) + "?version=" + version.getTime() );
             connection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream( connection.getInputStream() );
             response = IOUtils.toString( in, "UTF-8" );
@@ -93,6 +93,19 @@ public class ApiClient {
             }
         }
         return response;
+    }
+
+    public Profile getLatestSharedDataStore( SecretKey sharedKey ) {
+        List<Date> versions = getSharedDataStoreVersions( sharedKey );
+        try {
+            JSONObject response = new JSONObject( getSharedDataStore( sharedKey, versions.get( versions.size() - 1 ) ) );
+            JSONObject dataStoreAsJSON = new JSONObject( cryptoClient.decrypt( sharedKey, response.getString( "encryptedData" ) ) );
+            Profile profile = new Profile( dataStoreAsJSON.getJSONArray( Constants.PERMISSIONS ) );
+            return profile;
+        } catch ( JSONException e ) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public boolean createKeyStore( KeyStore keyStore ) {
@@ -164,11 +177,11 @@ public class ApiClient {
         return false;
     }
 
-    public boolean createSharedDataStore( String id, String admin, String encryptedData ) {
+    public boolean createSharedDataStore( SharedKey sharedProfile ) {
         try {
-            bodyAsJSON.put( "id", id );
-            bodyAsJSON.put( "admin", admin );
-            bodyAsJSON.put( "encryptedData", encryptedData );
+            bodyAsJSON.put( "id", cryptoClient.getHash( sharedProfile.getKey().getEncoded() ) );
+            bodyAsJSON.put( "admin", masterKeyHash );
+            bodyAsJSON.put( "encryptedData", cryptoClient.encrypt( sharedProfile.getKey(), sharedProfile.toJSON().toString() ) );
 
             url = new URL( "http://192.168.0.66:8080/api/data-stores/" );
             connection = (HttpURLConnection) url.openConnection();
@@ -200,12 +213,12 @@ public class ApiClient {
         return false;
     }
 
-    public boolean updateSharedDataStore( String id, String admin, String encryptedData ) {
+    public boolean updateSharedDataStore( SharedKey sharedProfile ) {
         try {
-            bodyAsJSON.put( "admin", admin );
-            bodyAsJSON.put( "encryptedData", encryptedData );
+            bodyAsJSON.put( "admin", masterKeyHash );
+            bodyAsJSON.put( "encryptedData", cryptoClient.encrypt( sharedProfile.getKey(), sharedProfile.toJSON().toString() ) );
 
-            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + id );
+            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + cryptoClient.getHash( sharedProfile.getKey().getEncoded() ) );
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod( "PUT" );
             connection.setDoOutput( true );
@@ -262,9 +275,9 @@ public class ApiClient {
         return null;
     }
 
-    public List<Date> getSharedDataStoreVersions( String id ) {
+    public List<Date> getSharedDataStoreVersions( SecretKey sharedKey ) {
         try {
-            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + id + "/versions" );
+            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + cryptoClient.getHash( sharedKey.getEncoded() ) + "/versions" );
             connection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream( connection.getInputStream() );
             JSONArray versionsAsJSON = new JSONArray( IOUtils.toString( in, "UTF-8" ) );

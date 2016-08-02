@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Profile {
-    private Map<Permission, String> permissions = new HashMap<>();
+    private Map<Permission.PermissionType, Permission> permissions = new HashMap<>();
 
     public Profile() {
     }
@@ -17,27 +17,31 @@ public class Profile {
         for ( int i = 0; i < profileAsJSON.length(); i++ ) {
             JSONObject permissionAsJSON = profileAsJSON.getJSONObject( i );
             String key = permissionAsJSON.keys().next();
-            Permission permission = Permission.valueOf( key );
+            Permission permission = new Permission( Permission.PermissionType.valueOf( key ) );
             permission.setValue( permissionAsJSON.getString( key ) );
-            permissions.put( permission, permission.getValue() );
+            permissions.put( permission.getPermission(), permission );
         }
     }
 
-    public Map<Permission, String> getPermissions() {
+    public Map<Permission.PermissionType, Permission> getPermissions() {
         return permissions;
     }
 
     public void addPermission( Permission permission ) {
-        this.permissions.put( permission, permission.getValue() );
+        this.permissions.put( permission.getPermission(), permission );
     }
 
-    public void setPermissions( Map<Permission, String> permissions ) {
+    public void setPermissions( Map<Permission.PermissionType, Permission> permissions ) {
         this.permissions = permissions;
+    }
+
+    public Permission getPermission( Permission.PermissionType permissionType ) {
+        return permissions.get( permissionType );
     }
 
     public JSONArray toJSON() throws JSONException {
         JSONArray profileAsJSON = new JSONArray();
-        for ( Permission permission : permissions.keySet() ) {
+        for ( Permission permission : permissions.values() ) {
             JSONObject permissionAsJSON = new JSONObject();
             profileAsJSON.put( permissionAsJSON.put( permission.name(), permission.getValue() ) );
         }

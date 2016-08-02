@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_height="wrap_content"
+                  android:layout_width="match_parent"
+                  android:key="permissions_preference_screen">
+
+    <EditTextPreference
+            android:key="label"
+            android:title="Set label"
+            android:hint="label"/>
+
+    <SwitchPreference
+            android:key="FULL_NAME"
+            android:title="Full Name"
+            android:defaultValue="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    <SwitchPreference
+            android:key="ADDRESS"
+            android:title="Address"
+            android:defaultValue="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    <SwitchPreference
+            android:key="PHONE"
+            android:title="Phone"
+            android:defaultValue="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    <SwitchPreference
+            android:key="EMAIL"
+            android:title="Email"
+            android:defaultValue="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+</PreferenceScreen>
