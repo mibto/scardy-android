@@ -26,7 +26,7 @@ public class ContactKey {
     public JSONObject toJSON() throws JSONException {
         JSONObject contactKeyAsJSON = new JSONObject();
         contactKeyAsJSON.put( LAST_UPDATE_DATE, lastUpdateDate.getTime() );
-        contactKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), Base64.NO_WRAP ) );
+        contactKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), Base64.URL_SAFE ) );
         return contactKeyAsJSON;
     }
 

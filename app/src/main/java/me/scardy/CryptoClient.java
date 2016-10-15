@@ -40,7 +40,7 @@ public class CryptoClient {
             cipher.init( Cipher.ENCRYPT_MODE, key );
             byte[] iv = cipher.getIV();
             byte[] encrypted = cipher.doFinal( raw.getBytes() );
-            return Base64.encodeToString( ArrayUtils.addAll( iv, encrypted ), Base64.NO_WRAP );
+            return Base64.encodeToString( ArrayUtils.addAll( iv, encrypted ), Base64.URL_SAFE );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -49,7 +49,7 @@ public class CryptoClient {
 
     public String decrypt( SecretKey key, String encodedAndEncrypted ) {
         try {
-            byte[] ivAndEncrypted = Base64.decode( encodedAndEncrypted, Base64.NO_WRAP );
+            byte[] ivAndEncrypted = Base64.decode( encodedAndEncrypted, Base64.URL_SAFE );
             byte[] iv = Arrays.copyOfRange( ivAndEncrypted, 0, 16 );
             byte[] encrypted = Arrays.copyOfRange( ivAndEncrypted, 16, ivAndEncrypted.length );
 
@@ -75,7 +75,7 @@ public class CryptoClient {
             MessageDigest md = MessageDigest.getInstance( "SHA-256" );
             md.update( key );
             byte[] digest = md.digest();
-            return Base64.encodeToString( digest, Base64.NO_WRAP ).replace( "/", "S" );
+            return Base64.encodeToString( digest, Base64.URL_SAFE ).replace( "/", "S" );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -132,10 +132,10 @@ public class CryptoClient {
     }
 
     public SecretKey getKeyFromString( String keyAsString ) {
-        return new SecretKeySpec( Base64.decode( keyAsString, Base64.NO_WRAP ), 0, 32, "AES" );
+        return new SecretKeySpec( Base64.decode( keyAsString, Base64.URL_SAFE ), 0, 32, "AES" );
     }
 
     public String getStringFromKey( SecretKey key ) {
-        return Base64.encodeToString( key.getEncoded(), Base64.NO_WRAP );
+        return Base64.encodeToString( key.getEncoded(), Base64.URL_SAFE );
     }
 }

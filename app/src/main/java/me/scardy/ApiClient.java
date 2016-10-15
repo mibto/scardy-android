@@ -29,6 +29,7 @@ public class ApiClient {
     private DataOutputStream out;
     private String masterKeyHash;
     private CryptoClient cryptoClient;
+    private String serverURL = "https://scardy.me:8443";
 
     public ApiClient( SecretKey masterKey, String masterKeyHash ) {
         this.masterKeyHash = masterKeyHash;
@@ -37,10 +38,11 @@ public class ApiClient {
 
     public String getKeyStore( String id, Date version ) {
         try {
-            url = new URL( "http://192.168.0.66:8080/api/key-stores/" + id + "?version=" + version.getTime() );
+            url = new URL( serverURL + "/api/key-stores/" + id + "?version=" + version.getTime() );
             connection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream( connection.getInputStream() );
             response = IOUtils.toString( in, "UTF-8" );
+
 
             if ( connection.getResponseCode() != 200 ) {
                 connection.disconnect();
@@ -73,7 +75,7 @@ public class ApiClient {
 
     public String getSharedDataStore( SecretKey sharedKey, Date version ) {
         try {
-            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + cryptoClient.getHash( sharedKey.getEncoded() ) + "?version=" + version.getTime() );
+            url = new URL( serverURL + "/api/data-stores/" + cryptoClient.getHash( sharedKey.getEncoded() ) + "?version=" + version.getTime() );
             connection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream( connection.getInputStream() );
             response = IOUtils.toString( in, "UTF-8" );
@@ -113,7 +115,7 @@ public class ApiClient {
             bodyAsJSON.put( "id", masterKeyHash );
             bodyAsJSON.put( "encryptedData", cryptoClient.encryptKeyStore( keyStore.toJSON().toString() ) );
 
-            url = new URL( "http://192.168.0.66:8080/api/key-stores/" );
+            url = new URL( serverURL + "/api/key-stores/" );
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod( "POST" );
             connection.setDoOutput( true );
@@ -147,7 +149,7 @@ public class ApiClient {
         try {
             bodyAsJSON.put( "encryptedData", cryptoClient.encryptKeyStore( keyStore.toJSON().toString() ) );
 
-            url = new URL( "http://192.168.0.66:8080/api/key-stores/" + masterKeyHash );
+            url = new URL( serverURL + "/api/key-stores/" + masterKeyHash );
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod( "PUT" );
             connection.setDoOutput( true );
@@ -183,7 +185,7 @@ public class ApiClient {
             bodyAsJSON.put( "admin", masterKeyHash );
             bodyAsJSON.put( "encryptedData", cryptoClient.encrypt( sharedProfile.getKey(), sharedProfile.toJSON().toString() ) );
 
-            url = new URL( "http://192.168.0.66:8080/api/data-stores/" );
+            url = new URL( serverURL + "/api/data-stores/" );
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod( "POST" );
             connection.setDoOutput( true );
@@ -218,7 +220,7 @@ public class ApiClient {
             bodyAsJSON.put( "admin", masterKeyHash );
             bodyAsJSON.put( "encryptedData", cryptoClient.encrypt( sharedProfile.getKey(), sharedProfile.toJSON().toString() ) );
 
-            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + cryptoClient.getHash( sharedProfile.getKey().getEncoded() ) );
+            url = new URL( serverURL + "/api/data-stores/" + cryptoClient.getHash( sharedProfile.getKey().getEncoded() ) );
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod( "PUT" );
             connection.setDoOutput( true );
@@ -250,7 +252,7 @@ public class ApiClient {
 
     public List<Date> getKeyStoreVersions() {
         try {
-            url = new URL( "http://192.168.0.66:8080/api/key-stores/" + masterKeyHash + "/versions" );
+            url = new URL( serverURL + "/api/key-stores/" + masterKeyHash + "/versions" );
             connection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream( connection.getInputStream() );
             JSONArray versionsAsJSON = new JSONArray( IOUtils.toString( in, "UTF-8" ) );
@@ -277,7 +279,7 @@ public class ApiClient {
 
     public List<Date> getSharedDataStoreVersions( SecretKey sharedKey ) {
         try {
-            url = new URL( "http://192.168.0.66:8080/api/data-stores/" + cryptoClient.getHash( sharedKey.getEncoded() ) + "/versions" );
+            url = new URL( serverURL + "/api/data-stores/" + cryptoClient.getHash( sharedKey.getEncoded() ) + "/versions" );
             connection = (HttpURLConnection) url.openConnection();
             in = new BufferedInputStream( connection.getInputStream() );
             JSONArray versionsAsJSON = new JSONArray( IOUtils.toString( in, "UTF-8" ) );

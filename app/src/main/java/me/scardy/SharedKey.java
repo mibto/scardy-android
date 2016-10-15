@@ -83,7 +83,7 @@ public class SharedKey {
             permissionsAsJSON.put( permissionAsJSON.put( permission.name(), permission.getValue() ) );
         }
         sharedKeyAsJSON.put( PERMISSIONS, permissionsAsJSON );
-        sharedKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), Base64.NO_WRAP ) );
+        sharedKeyAsJSON.put( KEY, Base64.encodeToString( key.getEncoded(), Base64.URL_SAFE ) );
         return sharedKeyAsJSON;
     }
 }

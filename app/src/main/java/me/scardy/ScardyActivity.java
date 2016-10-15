@@ -359,15 +359,45 @@ public class ScardyActivity extends AppCompatActivity implements ContactsFragmen
             updateRelevantShares( email );
         }
 
-        //update keyStore, encrypt and update remote
-        keyStore.setProfile( profile );
-        if ( apiClient.updateKeyStore( keyStore ) ) {
-            Toast.makeText( activity, "profile saved", Toast.LENGTH_SHORT ).show();
-        }
 
-        for ( SharedKey sharedKey : keyStore.getChangedSharedKeys() ) {
-            apiClient.updateSharedDataStore( sharedKey );
+        if ( inputValidation( profile ) ) {
+            //update keyStore, encrypt and update remote
+            keyStore.setProfile( profile );
+            if ( apiClient.updateKeyStore( keyStore ) ) {
+                Toast.makeText( activity, "profile saved", Toast.LENGTH_SHORT ).show();
+            }
+
+            for ( SharedKey sharedKey : keyStore.getChangedSharedKeys() ) {
+                apiClient.updateSharedDataStore( sharedKey );
+            }
+        } else {
+            Toast.makeText( activity, "invalid input", Toast.LENGTH_SHORT ).show();
         }
+    }
+
+    private boolean inputValidation( Profile profile ) {
+        boolean valid = true;
+        for ( Permission permission : profile.getPermissions().values() ) {
+            if ( permission.getValue().contains( "'" ) ) {
+                valid = false;
+            }
+            if ( permission.getValue().contains( "\\" ) ) {
+                valid = false;
+            }
+            if ( permission.getValue().contains( "\"" ) ) {
+                valid = false;
+            }
+            if ( permission.getValue().contains( ";" ) ) {
+                valid = false;
+            }
+            if ( permission.getValue().contains( "{" ) ) {
+                valid = false;
+            }
+            if ( permission.getValue().contains( "}" ) ) {
+                valid = false;
+            }
+        }
+        return valid;
     }
 
     private void updateRelevantShares( Permission permission ) {
@@ -394,7 +424,7 @@ public class ScardyActivity extends AppCompatActivity implements ContactsFragmen
 
         ImageView image = (ImageView) dialogLayout.findViewById( R.id.qr_code_image );
         if ( image != null ) {
-            Bitmap bitmap = generateQRCode( Base64.encodeToString( sharedKey.getEncoded(), Base64.NO_WRAP ) );
+            Bitmap bitmap = generateQRCode( Base64.encodeToString( sharedKey.getEncoded(), Base64.URL_SAFE ) );
             if ( bitmap != null ) {
                 image.setImageBitmap( bitmap );
             }
